@@ -201,6 +201,10 @@ class FloatrayBoard {
     this._brush_path.type = type;
     return true;
   }
+  // 删除画笔路径
+  deleteBrushPath(index) {
+    
+  }
   // 选择模式 选中画笔
   _selectBrush(x, y) {
     
