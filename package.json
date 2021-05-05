@@ -1,0 +1,20 @@
+{
+  "name": "FloatRay_whiteBoard",
+  "version": "1.0.0",
+  "description": "在线白板，实时互动~",
+  "main": "index.js",
+  "scripts": {
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bright00007/FloatRay_whiteBoard.git"
+  },
+  "keywords": ["在线白板", "实时互动"],
+  "author": "floatray",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bright00007/FloatRay_whiteBoard/issues"
+  },
+  "homepage": "https://github.com/bright00007/FloatRay_whiteBoard#readme"
+}
