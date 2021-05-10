@@ -1,6 +1,6 @@
 "use strict";
 
-import FloatrayBoard from "../../library/floatRayBoard.js";
+import FloatrayBoard from "../../library/floatrayBoard.js";
 
 window.addEventListener("load", () => {
   const draw = window.draw = new FloatrayBoard("#whiteBoardBox");
