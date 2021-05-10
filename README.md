@@ -10,7 +10,9 @@ const draw = new FloatrayBoard("selector");
 ## functions
 ### 重置canvas大小，获取父元素宽高，重新赋值
 draw.resetSize();
-### 设置画布是否选择模式（开发中）
+### 设置canvas光标，CUR：css cursor值
+draw.setCanvasCursor(CUR);
+### 设置画布是否选择模式，选择后可拖动画笔
 draw.setCanvasSelect(boolean);
 ### 设置画笔颜色，仅支持HTML 6位（#000000）
 draw.setBrushColor("#000000");
@@ -31,3 +33,5 @@ draw.setBrushType(type);
 10. 文本
 ### 删除画笔路径
 draw.deleteBrushPath(index);
+### 撤回画笔
+draw.revocationBrushPath();

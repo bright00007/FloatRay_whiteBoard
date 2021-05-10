@@ -24,14 +24,12 @@ img {
   position: absolute;
   top: 5%;
   left: 6%;
-  z-index: 2;
+  z-index: -1;
   width: 240px;
   opacity: .46;
 }
 
 #whiteBoardBox {
-  position: relative;
-  z-index: 8;
   width: 100%;
   height: 100%;
 }
@@ -42,55 +40,144 @@ img {
   bottom: 0;
   z-index: 9;
   width: 100%;
-  height: 52px;
   padding: 10px 20px;
   box-shadow: 0 0 10px 0 rgba(34, 34, 34, 0.26);
+  background-color: #ffffff;
 }
 
 .toolbar .toolbar-operates {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
-  height: 32px;
 }
 
-.toolbar .toolbar-operates li {
+.toolbar .toolbar-operates > li {
+  box-sizing: content-box;
   width: 32px;
   height: 32px;
+  padding: 5px 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 15px;
   opacity: .46;
   cursor: pointer;
   transition: opacity .2s;
 }
 
-.toolbar .toolbar-operates li:nth-child(1), .toolbar .toolbar-operates li:nth-child(2), .toolbar .toolbar-operates li:nth-child(3), .toolbar .toolbar-operates li:nth-child(4) {
+.toolbar .toolbar-operates > li:nth-child(1), .toolbar .toolbar-operates > li:nth-child(2), .toolbar .toolbar-operates > li:nth-child(3), .toolbar .toolbar-operates > li:nth-child(4) {
   font-size: 32px;
 }
 
-.toolbar .toolbar-operates li:nth-child(5), .toolbar .toolbar-operates li:nth-child(6) {
+.toolbar .toolbar-operates > li:nth-child(5), .toolbar .toolbar-operates > li:nth-child(6) {
   font-size: 30px;
 }
 
-.toolbar .toolbar-operates li:nth-child(7), .toolbar .toolbar-operates li:nth-child(8) {
+.toolbar .toolbar-operates > li:nth-child(7), .toolbar .toolbar-operates > li:nth-child(8) {
   font-size: 26px;
 }
 
-.toolbar .toolbar-operates li:nth-child(9), .toolbar .toolbar-operates li:nth-child(10) {
+.toolbar .toolbar-operates > li:nth-child(9), .toolbar .toolbar-operates > li:nth-child(10) {
   font-size: 22px;
 }
 
-.toolbar .toolbar-operates li:hover {
+.toolbar .toolbar-operates > li:hover {
   opacity: 1;
 }
 
-.toolbar .toolbar-operates li:active {
-  opacity: .8;
+.toolbar .toolbar-operates > li:active {
+  opacity: 0.6 !important;
 }
 
-.toolbar .toolbar-operates li.active {
+.toolbar .toolbar-operates > li.active {
+  opacity: 1;
+  color: #409EFF;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color {
+  position: relative;
+  opacity: 1;
+  margin: 0 12px;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color:hover {
+  opacity: 1 !important;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color:hover ul {
+  display: block;
+  opacity: 1;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color:active {
+  opacity: 1 !important;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 34, 34, 0.46);
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color p span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333333;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  position: absolute;
+  cursor: pointer;
+  bottom: 42px;
+  border-radius: 19px;
+  background-color: #fff;
+  box-shadow: 0 0 10px 0 rgba(34, 34, 34, 0.46);
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  margin: 8px;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(1) {
+  background-color: #409EFF;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(2) {
+  background-color: #67C23A;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(3) {
+  background-color: #E6A23C;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(4) {
+  background-color: #F56C6C;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(5) {
+  background-color: #909399;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-color ul li:nth-child(6) {
+  background-color: #000000;
+}
+
+.toolbar .toolbar-operates > li.toolbar-operate-size {
+  font-size: 22px;
+  color: #333333 !important;
   opacity: 1;
 }
 

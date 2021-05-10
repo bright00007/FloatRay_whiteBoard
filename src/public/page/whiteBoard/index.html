@@ -9,8 +9,8 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>在线白板，实时互动~</title>
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/logo/favicon.ico">
-    <link rel="stylesheet" type="text/css" href="./index.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/images/logo/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/page/whiteBoard/index.css">
   </head>
   <body>
     <div id="app">
@@ -21,7 +21,7 @@
       <div class="toolbar">
         <ul class="toolbar-operates">
           <li class="iconfont icon-select" data-type="-1"></li>
-          <li class="iconfont icon-brush" data-type="1"></li>
+          <li class="iconfont icon-brush active" data-type="1"></li>
           <li class="iconfont icon-line0" data-type="2"></li>
           <li class="iconfont icon-line2" data-type="3"></li>
           <li class="iconfont icon-arrow0" data-type="4"></li>
@@ -34,10 +34,23 @@
           <li class="iconfont icon-eraser" data-type="0"></li>
           <li class="iconfont icon-delete" data-type="-2"></li>
           <li class="iconfont icon-recall" data-type="-3"></li>
+          <li class="toolbar-operate-color" data-type="-4">
+            <p><span></span></p>
+            <ul>
+              <li data-color="#409EFF"></li>
+              <li data-color="#67C23A"></li>
+              <li data-color="#E6A23C"></li>
+              <li data-color="#F56C6C"></li>
+              <li data-color="#909399"></li>
+              <li data-color="#000000"></li>
+            </ul>
+          </li>
+          <li class="toolbar-operate-size" data-type="-5">A-</li>
+          <li class="toolbar-operate-size" data-type="-6">A+</li>
         </ul>
       </div>
     </div>
 
-   <script type="module" src="./index.js"></script>
+   <script type="module" src="/page/whiteBoard/index.js"></script>
   </body>
 </html>
