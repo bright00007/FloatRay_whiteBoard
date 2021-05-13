@@ -66,6 +66,6 @@ window.addEventListener("load", () => {
       if (result) {
         document.querySelector(".toolbar-operate-color p span").style["background-color"] = color;
       }
-      });
+    });
   })
 });

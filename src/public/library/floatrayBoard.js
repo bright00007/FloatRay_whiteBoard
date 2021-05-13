@@ -92,7 +92,7 @@ class FloatrayBoard {
     this._canvas = document.createElement("canvas");
     this._canvas.id = "floatrayBoard";
     this._canvas.style.position = "relative";
-    this._canvas.style["z-index"] = "9"
+    this._canvas.style["z-index"] = "9";
     this.resetSize();
     this.setCanvasCursor();
     this._canvas.appendChild(document.createTextNode("您的浏览器不支持CANVAS，请用其它浏览器打开，谢谢！"));
@@ -102,103 +102,182 @@ class FloatrayBoard {
   }
   // 初始化监听事件
   _init() {
-    // 监听window窗口resize事件
-    window.addEventListener("resize", () => {
-      this.resetSize();
-    });
-    // 监听canvas鼠标左键按下事件
-    this._canvas.addEventListener('mousedown', (event) => {
-      // 判断是否鼠标左键按下
-      if (event.button !== 0) {
-        return false;
-      }
-      // 判断是否为选择模式
-      if (this._select) {
-        this._selectBrush(event.offsetX, event.offsetY);
-        if (this._brush_path.raw_index !== undefined) {
-          this._drag = true;
-          this._dragStart.x = event.offsetX;
-          this._dragStart.y = event.offsetY;
+    // 判断是否移动端
+    if (!this.isPCBrowser()) {
+      // 监听canvas touchstart事件
+      this._canvas.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        const { pageX: x, pageY: y} = event.targetTouches[0];
+        // 判断是否为选择模式
+        if (this._select) {
+          this._selectBrush(x, y);
+          if (this._brush_path.raw_index !== undefined) {
+            this._drag = true;
+            this._dragStart.x = x;
+            this._dragStart.y = y;
+          }
+          return false;
         }
-        return false;
-      }
-      // 判断画笔类型是否为绘制文本
-      if (this._brush_path.type === 10) {
-        // 插入input框
-        this._addInputText(event.offsetX, event.offsetY);
-        return false;
-      }
-      // 开启画笔，记录起始坐标
-      this._brush = true;
-      this._brush_path.start.x = event.offsetX;
-      this._brush_path.start.y = event.offsetY;
-      this._brush_path.path.push(this._brush_path.start);
-    });
-    // 监听canvas鼠标左键按下移动鼠标事件
-    this._canvas.addEventListener('mousemove', (event) => {
-      // 判断是否为选择模式且有选中画笔路径且可拖动
-      if (this._select && this._brush_path.raw_index !== undefined && this._drag) {
-        this._dragBrush(event.offsetX - this._dragStart.x, event.offsetY - this._dragStart.y);
-        return false;
-      }
-      // 判断画笔是否开启、画笔类型是否问绘制文本
-      if (!this._brush || this._brush_path.type === 10) {
-        return false;
-      }
-      // 记录画笔路径
-      const path = { x: event.offsetX, y: event.offsetY };
-      this._brush_path.path.push(path);
-    });
-    // 监听canvas鼠标左键抬起事件
-    this._canvas.addEventListener('mouseup', (event) => {
-      // 判断是否为选择模式
-      if (this._select && this._drag) {
-        this._drag = false;
-        if (this._brush_path.operate_type === 2) {
-          this._addHistory();
-          this._brush_path.raw_index = this._brush_history.length - 1;
+        // 判断画笔类型是否为绘制文本
+        if (this._brush_path.type === 10) {
+          // 插入input框
+          this._addInputText(x, y);
+          return false;
         }
-        return false;
-      }
-      // 判断是否鼠标左键抬起、画笔类型是否问绘制文本
-      if (event.button !== 0 || !this._brush || this._brush_path.type === 10) {
-        return false;
-      }
-      // 关闭画笔，记录结束坐标
-      this._brush = false;
-      this._brush_path.end.x = event.offsetX;
-      this._brush_path.end.y = event.offsetY;
-      // 添加历史画笔栈，初始化当前画笔路径
-      this._addHistory();
-    });
-    // 监听canvas鼠标移开事件
-    this._canvas.addEventListener('mouseout', (event) => {
-      // 判断是否为选择模式
-      if (this._select && this._drag) {
-        this._drag = false;
-        if (this._brush_path.operate_type === 2) {
-          this._addHistory();
+        // 开启画笔，记录起始坐标
+        this._brush = true;
+        this._brush_path.start.x = x;
+        this._brush_path.start.y = y;
+        this._brush_path.path.push(this._brush_path.start);
+      });
+      // 监听canvas touchmove事件
+      this._canvas.addEventListener('touchmove', (event) => {
+        event.preventDefault();
+        const { pageX: x, pageY: y} = event.targetTouches[0];
+        // 判断是否为选择模式且有选中画笔路径且可拖动
+        if (this._select && this._brush_path.raw_index !== undefined && this._drag) {
+          this._dragBrush(x - this._dragStart.x, y - this._dragStart.y);
+          return false;
         }
-        return false;
-      }
-      // 判断画笔是否开启、画笔类型是否问绘制文本
-      if (!this._brush || this._brush_path.type === 10) {
-        return false;
-      }
-      // 鼠标移开canvas关闭画笔，记录结束坐标
-      this._brush = false;
-      this._brush_path.end.x = event.offsetX;
-      this._brush_path.end.y = event.offsetY;
-      // 添加历史画笔栈，初始化当前画笔路径
-      this._addHistory();
-    });
+        // 判断画笔是否开启、画笔类型是否问绘制文本
+        if (!this._brush || this._brush_path.type === 10) {
+          return false;
+        }
+        // 记录画笔路径
+        const path = { x, y };
+        this._brush_path.path.push(path);
+      });
+      // 监听canvas touchend事件
+      this._canvas.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        const { pageX: x, pageY: y} = event.changedTouches[0];
+        // 判断是否为选择模式
+        if (this._select && this._drag) {
+          this._drag = false;
+          if (this._brush_path.operate_type === 2) {
+            this._addHistory();
+            this._brush_path.raw_index = this._brush_history.length - 1;
+          }
+          return false;
+        }
+        // 判断画笔类型是否为绘制文本
+        if (!this._brush || this._brush_path.type === 10) {
+          return false;
+        }
+        // 关闭画笔，记录结束坐标
+        this._brush = false;
+        this._brush_path.end.x = x;
+        this._brush_path.end.y = y;
+        // 添加历史画笔栈，初始化当前画笔路径
+        this._addHistory();
+      });
+    } else {
+      // 监听window窗口resize事件
+      window.addEventListener("resize", () => {
+        this.resetSize();
+      });
+      // 监听canvas鼠标左键按下事件
+      this._canvas.addEventListener('mousedown', (event) => {
+        // 判断是否鼠标左键按下
+        if (event.button !== 0) {
+          return false;
+        }
+        // 判断是否为选择模式
+        if (this._select) {
+          this._selectBrush(event.offsetX, event.offsetY);
+          if (this._brush_path.raw_index !== undefined) {
+            this._drag = true;
+            this._dragStart.x = event.offsetX;
+            this._dragStart.y = event.offsetY;
+          }
+          return false;
+        }
+        // 判断画笔类型是否为绘制文本
+        if (this._brush_path.type === 10) {
+          // 插入input框
+          this._addInputText(event.offsetX, event.offsetY);
+          return false;
+        }
+        // 开启画笔，记录起始坐标
+        this._brush = true;
+        this._brush_path.start.x = event.offsetX;
+        this._brush_path.start.y = event.offsetY;
+        this._brush_path.path.push(this._brush_path.start);
+      });
+      // 监听canvas鼠标左键按下移动鼠标事件
+      this._canvas.addEventListener('mousemove', (event) => {
+        // 判断是否为选择模式且有选中画笔路径且可拖动
+        if (this._select && this._brush_path.raw_index !== undefined && this._drag) {
+          this._dragBrush(event.offsetX - this._dragStart.x, event.offsetY - this._dragStart.y);
+          return false;
+        }
+        // 判断画笔是否开启、画笔类型是否问绘制文本
+        if (!this._brush || this._brush_path.type === 10) {
+          return false;
+        }
+        // 记录画笔路径
+        const path = { x: event.offsetX, y: event.offsetY };
+        this._brush_path.path.push(path);
+      });
+      // 监听canvas鼠标左键抬起事件
+      this._canvas.addEventListener('mouseup', (event) => {
+        // 判断是否为选择模式
+        if (this._select && this._drag) {
+          this._drag = false;
+          if (this._brush_path.operate_type === 2) {
+            this._addHistory();
+            this._brush_path.raw_index = this._brush_history.length - 1;
+          }
+          return false;
+        }
+        // 判断是否鼠标左键抬起、画笔类型是否问绘制文本
+        if (event.button !== 0 || !this._brush || this._brush_path.type === 10) {
+          return false;
+        }
+        // 关闭画笔，记录结束坐标
+        this._brush = false;
+        this._brush_path.end.x = event.offsetX;
+        this._brush_path.end.y = event.offsetY;
+        // 添加历史画笔栈，初始化当前画笔路径
+        this._addHistory();
+      });
+      // 监听canvas鼠标移开事件
+      this._canvas.addEventListener('mouseout', (event) => {
+        // 判断是否为选择模式
+        if (this._select && this._drag) {
+          this._drag = false;
+          if (this._brush_path.operate_type === 2) {
+            this._addHistory();
+          }
+          return false;
+        }
+        // 判断画笔是否开启、画笔类型是否问绘制文本
+        if (!this._brush || this._brush_path.type === 10) {
+          return false;
+        }
+        // 鼠标移开canvas关闭画笔，记录结束坐标
+        this._brush = false;
+        this._brush_path.end.x = event.offsetX;
+        this._brush_path.end.y = event.offsetY;
+        // 添加历史画笔栈，初始化当前画笔路径
+        this._addHistory();
+      });
+    }
+  }
+  // 判断是否为PC浏览器
+  isPCBrowser() {
+    return !/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(navigator.userAgent);
   }
   // 重置canvas大小
   resetSize() {
     const width = getComputedStyle(this._parent).width;
     const height = getComputedStyle(this._parent).height;
-    this._canvas.width = width.replace("px", "");
-    this._canvas.height = height.replace("px", "");
+    const dpr = window.devicePixelRatio || 1;
+    this._canvas.style.width = width;
+    this._canvas.style.height = height;
+    this._canvas.width = dpr * width.replace("px", "");
+    this._canvas.height = dpr * height.replace("px", "");
+    this._canvas.getContext("2d").scale(dpr, dpr);
   }
   // 设置canvas光标
   setCanvasCursor(CUR = "pointer") {
@@ -219,7 +298,7 @@ class FloatrayBoard {
     if (typeof(value) !== "boolean") {
       return false;
     }
-    if (!value) {
+    if (this._select && !value) {
       const ctx = this._canvas.getContext("2d");
       // 清除画布，绘制画布历史栈
       this._drawHistory();
@@ -313,7 +392,7 @@ class FloatrayBoard {
     }
     // 查找历史栈中最后一个被选中的画笔索引
     let index = this._brush_history.reverse().findIndex(brush => {
-      // 判断是否需要绘制
+      // 判断画笔是否绘制
       if (!brush.isDraw) {
         return false;
       }
@@ -532,7 +611,7 @@ class FloatrayBoard {
         const er = 32;
         data.path.forEach(xyz => {
           const { x: ex, y: ey } = xyz;
-          this._circle(ctx, ex + er, ey + er, er, "#ffffff", 1, true);
+          this._circle(ctx, this.isPCBrowser() ? ex + er : ex, this.isPCBrowser() ? ey + er : ey, er, "#ffffff", 1, true);
         });
         ctx.globalCompositeOperation = "source-over";
         break;
