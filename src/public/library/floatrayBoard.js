@@ -391,6 +391,7 @@ class FloatrayBoard {
       this._drawHistory();
     }
     // 查找历史栈中最后一个被选中的画笔索引
+    const dpr = window.devicePixelRatio || 1;
     let index = this._brush_history.reverse().findIndex(brush => {
       // 判断画笔是否绘制
       if (!brush.isDraw) {
@@ -398,9 +399,9 @@ class FloatrayBoard {
       }
       let inPath = undefined;
       if (brush.type === 1 || brush.type === 2 || brush.type === 3 || brush.type === 4 || brush.type === 5) {
-        inPath = ctx.isPointInStroke(brush.path2D, x, y);
+        inPath = ctx.isPointInStroke(brush.path2D, x * dpr, y * dpr);
       } else {
-        inPath = ctx.isPointInPath(brush.path2D, x, y, "evenodd");
+        inPath = ctx.isPointInPath(brush.path2D, x * dpr, y * dpr, "evenodd");
       }
       return inPath;
     });
