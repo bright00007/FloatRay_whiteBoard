@@ -3,7 +3,7 @@
 import FloatrayBoard from "../../library/floatrayBoard.js";
 
 window.addEventListener("load", () => {
-  const draw = window.draw = new FloatrayBoard("#whiteBoardBox");
+  const draw = window.draw = new FloatrayBoard("#whiteBoardBox", "wss://tool.floatray.work/wb");
   // 初始化光标类型
   draw.setCanvasCursor(1);
 

@@ -17,9 +17,18 @@ const port = normalizePort(process.env.PORT || '8000');
 
 /**
  * Create HTTP server.
+ * Socket.io
  */
 
 const server = http.createServer(app.callback());
+
+/**
+ * Socket.io
+ */
+
+const io = require('socket.io')(server);
+const wb = require('../sockets/wb');
+io.of('/wb').on('connection', wb);
 
 /**
  * Listen on provided port, on all network interfaces.

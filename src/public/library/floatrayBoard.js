@@ -1,6 +1,8 @@
 "use strict";
 
 class FloatrayBoard {
+  // webSocket
+  _socket = null;
   // 是否开启选择模式
   _select = false;
   // 是否允许画笔拖动
@@ -69,9 +71,13 @@ class FloatrayBoard {
         if (propKey === "length") {
           return true;
         }
-        this._brush_path.color = this._color;
-        this._brush_path.size = this._size;
+        if (this._brush_path.operate_type !== 2) {
+          this._brush_path.color = this._color;
+          this._brush_path.size = this._size;
+        }
         this._graphing();
+        // 发生路径到服务器
+        this._socket.emit("brushPath", JSON.stringify(this._brush_path));
         return true;
       }
     }),
@@ -86,7 +92,7 @@ class FloatrayBoard {
   };
   // 画笔历史栈
   _brush_history = [];
-  constructor(selector) {
+  constructor(selector, ws = null) {
     // 插入canvas元素
     this._parent = document.querySelector(selector);
     this._canvas = document.createElement("canvas");
@@ -99,6 +105,10 @@ class FloatrayBoard {
     this._parent.appendChild(this._canvas);
     // 执行初始化方法
     this._init();
+    // 执行webSocket初始化
+    if (ws !== null) {
+      this._socketInit(ws);
+    }
   }
   // 初始化监听事件
   _init() {
@@ -264,6 +274,51 @@ class FloatrayBoard {
       });
     }
   }
+  // webSocket初始化
+  _socketInit(ws) {
+    this._socket = io(ws);
+    // 连接成功
+    this._socket.on("connect", () => {
+      const room = this.getQueryString("room");
+      // 加入房间，房间号为空则分配新房间
+      this._socket.emit("joinRoom", room);
+    });
+    // 分配新房间
+    this._socket.on("giveRoom", room => {
+      window.location.search = `?room=${room}`;
+    })
+    // 远程当前画笔路径
+    this._socket.on('brushPath', path => {
+      const brush = JSON.parse(path);
+      if (brush.operate_type === 2) {
+        this._brush_history[brush.raw_index].isDraw = false;
+      }
+      this._graphing(brush);
+    });
+    // 远程历史栈画笔路径
+    this._socket.on('brushHistory', path => {
+      const brush = JSON.parse(path);
+      if (brush.operate_type === 0) {
+        this._brush_history[brush.raw_index].isDraw = false;
+        this._drawHistory();
+      }
+      brush.path2D = this._creatPath2D(brush);
+      this._brush_history.push(brush);
+    });
+    // 远程历史栈画笔路径删除
+    this._socket.on('deleteBrushHistory', index => {
+      const path = this._brush_history.pop();
+      if (path.operate_type !== 1) {
+        this._brush_history[path.raw_index].isDraw = true;
+      }
+      // 重新绘制
+      this._drawHistory();
+    });
+    // 断开连接
+    this._socket.on("disconnect", () => {
+      console.log("disconnect");
+    });
+  }
   // 判断是否为PC浏览器
   isPCBrowser() {
     return !/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(navigator.userAgent);
@@ -370,6 +425,17 @@ class FloatrayBoard {
     }
     // 重新绘制
     this._drawHistory();
+    // 发送信息到服务器删除历史栈(-1为最后一项)
+    this._socket.emit("deleteBrushHistory", -1);
+  }
+  // tool 获取query参数
+  getQueryString(name) {
+    const reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+    const r = window.location.search.substr(1).match(reg);
+    if (r!=null) {
+      return unescape(r[2]);
+    } 
+    return null;
   }
   // tool 获取string汉字的个数
   getStringHanziNumbere(str) {
@@ -534,8 +600,10 @@ class FloatrayBoard {
   }
   // 添加历史画笔栈，初始化当前画笔路径
   _addHistory() {
-    // 添加画笔路径Path2D对象备份，操作为删除时不备份
     const path = JSON.parse(JSON.stringify(this._brush_path));
+    // 发送信息服务器添加路径栈
+    this._socket.emit("brushHistory", JSON.stringify(path));
+    // 添加画笔路径Path2D对象备份，操作为删除时不备份
     if (this._brush_path.operate_type !== 0) {
       path.path2D = this._creatPath2D();
     }
